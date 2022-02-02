@@ -1,12 +1,10 @@
 """Bio-Stats 821 Assignment 3 Mohammad Anas."""
 
-
-from os import lseek
 from typing import Union, Any
 from datetime import datetime
 
 
-def parse_data(filename: str) -> dict[str, list[Any]]:
+def parse_data(filename: str) -> dict[str, list[str]]:
     """Return data as dictionary, column names as keys, lists as values."""
     data_lst = []  # a list of  list of each data entry.  O(1)
     with open(filename, encoding="UTF-8-sig") as file:  # we open the file  O(1)
@@ -47,28 +45,21 @@ def parse_data(filename: str) -> dict[str, list[Any]]:
 # O(4) + O(N^2 + N) +  O(2N^2 + 2N)
 # O(3N^2 + 3N + 4) ->  `O(N^2)`
 
-patient = parse_data(  # we load the patients data set
-    "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021/\
-SoftwareTools/Assignment 2/PatientCorePopulatedTable.txt"
-)
-tests = parse_data(  # we load the test data set
-    "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021/\
-SoftwareTools/Assignment 2/LabsCorePopulatedTable.txt"
-)
 
-
-def num_older_than(age: Union[int, float], data: dict[str, list[Any]]) -> int:
+def num_older_than(age: Union[int, float], patient_data: dict[str, list[Any]]) -> int:
     """Return number of patients greater than age."""
     today_date: datetime = datetime.today()  # O(1) generate todays date
 
-    data["PatientDateOfBirth"] = [
+    patient_data["PatientDateOfBirth"] = [
         datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f")
-        for i in data["PatientDateOfBirth"]  # list comprehension
+        for i in patient_data["PatientDateOfBirth"]  # list comprehension
     ]  # we just convert every date to datetime O(N) method and make a
     # list if it O(N). Insert this list as value to our
     # data dictionary  O(N+N+1) -> O(2N+ 1) -> O(N)
 
-    data["Age"] = [((today_date - i).days / 365.25) for i in data["PatientDateOfBirth"]]
+    patient_data["Age"] = [
+        ((today_date - i).days / 365.25) for i in patient_data["PatientDateOfBirth"]
+    ]
     # in the above list comprehension
     # we insert another value in dictionary,O(1)
     # make a list. Loop over birthdate of patients and subtract the todays date O(N)
@@ -78,7 +69,7 @@ def num_older_than(age: Union[int, float], data: dict[str, list[Any]]) -> int:
     # O(N+N+N+N) -> O(4N) -> O(N)
 
     counter: int = 0  # create a new variable to count the number greater than age. O(1)
-    for i in data["Age"]:  # We loop over age and see if the age if
+    for i in patient_data["Age"]:  # We loop over age and see if the age if
         if i > age:  # a number is greater than the given value
             counter += 1  # we add 1 to the value of counter and
             # than assign it to to the counter
@@ -97,7 +88,7 @@ def sick_patients(
 ) -> list[str]:
     """Return unique Patients visiting given lab with results >/< value."""
     # we raise a value error if the gt_lt does not have correct value
-    if gt_lt != ">" or gt_lt != "<":  # O(2) two conditions checked
+    if gt_lt != ">" and gt_lt != "<":  # O(2) two conditions checked
         raise ValueError(f"Arguement gt_lt does not accept the value {gt_lt}")  # O(1)
 
     patients = []  # create an empty list  O(1)
@@ -139,5 +130,14 @@ def sick_patients(
 # complexity of the above function is O(2+1+1+N+N+N+1) -> O(5+3N) -> O(N)
 
 if __name__ == "__main__":
+    patient = parse_data(
+        "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021/SoftwareTools/\
+Assignment 2/PatientCorePopulatedTable.txt"
+    )
+    tests = parse_data(
+        "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021/SoftwareTools/\
+Assignment 2/LabsCorePopulatedTable.txt"
+    )
+
     print(sick_patients("METABOLIC: ALBUMIN", ">", 3.1, tests))
     print(num_older_than(51.2, patient))
