@@ -72,7 +72,8 @@ def num_older_than(
     # data dictionary  O(N+N+1) -> O(2N+ 1) -> O(N)
 
     patient_data["Age"] = [
-        ((today_date - i).days / 365.25) for i in patient_data["PatientDateOfBirth"]
+        ((today_date - i).days / 365.25)
+        for i in patient_data["PatientDateOfBirth_dtformat"]
     ]
     # in the above list comprehension
     # we insert another value in dictionary,O(1)
