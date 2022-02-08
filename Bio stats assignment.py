@@ -141,3 +141,71 @@ def sick_patients(
     return unique_patients_  # O(1)
 
     # complexity of the above function is O(2+1+1+N+N+N+1) -> O(5+3N) -> O(N)
+
+
+def patient_age(
+    patientID: str, labs_data: dict[str, list[str]], patient_data: dict[str, list[str]]
+) -> Union[int, str]:
+    """Return the age oof patient on their first test date."""
+    # returns this string if Patient not in data
+    if patientID not in patient_data["PatientID"]:  # O(1)
+        return f"No information available on patient with ID:{patientID}"  # O(1)
+
+    if "PatientDateOfBirth" not in patient_data.keys():  # O(1)
+        return "No information found regarding Age"  # O(1)
+
+    # create an empty list to store Visit dates on the patient
+    labvisit_dates: list[str] = []  # O(1)
+    # loop of patients in labs data and store their information
+    # on visit dates in the above list
+    # we use indices to do this where ever the patient name is found
+    # their index position in the list to access their information on
+    # visit date
+    for i in range(len(labs_data["PatientID"])):  # O(N)
+        if labs_data["PatientID"][i] == patientID:  # O(3) extract list from dictionary
+            # then extract element from that list
+            #  then equate
+            labvisit_dates.append(
+                labs_data["LabDateTime"][i]
+            )  # O(3) # extract list from dictionary
+            # extract element from list
+            # append to labvisit date
+    # O(N(3+3))-> O(6N)-> O(N)
+
+    # we use list comprehension to convert string dates to datetime format
+    # time complexity of below string: O(N) since interate over visit lists and
+    # converts each element to datetime format
+    visit_dates_dt: list[datetime] = [
+        datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f") for i in labvisit_dates
+    ]  # O(N)
+
+    # we loop over patients data and extract their date of birth
+    # we loop of patientID and extract the index from the list
+    # use that index to extract the patients date of birth
+    for i in range(len(patient_data["PatientID"])):  # O(N)
+        if (
+            patient_data["PatientID"][i] == patientID
+        ):  # O(3) extract list from dictionary
+            # extract element from list
+            # check if equal to patientID
+            patient_DOB = patient_data["PatientDateOfBirth"][
+                i
+            ]  # O(3) extract list, extract
+            # extract element and assign
+    # time complexity of above loop: O(N(3+3))-> #O(N)
+
+    # patient date of birth is stored in the datetime format
+    patient_DOB_dtformat = datetime.strptime(
+        patient_DOB, "%Y-%m-%d %H:%M:%S.%f"
+    )  # O(1)
+    # we then take the minimum date from that
+    # patients visiting dates to labs
+    first_test_date = min(visit_dates_dt)  # O(N) since it loops over each element
+    # and compares them
+    # subtract patients date of birth from first test date to get age in years
+    age = int((first_test_date - patient_DOB_dtformat).days / 365.25)  # O(4)
+    # the above line does 4 four operation: subtract dates, extract days,
+    #  divideby 365 to get years and assign
+    return age  # O(N)
+
+    # O(5) +O(N) + O(N) +O(N) +O(1) +O(N) +O(4) -> O(8+4N)-> O(N)
