@@ -85,7 +85,7 @@ def num_older_than(
 
     counter: int = 0  # create a new variable to count the number greater than age. O(1)
     for i in patient_data["Age"]:  # We loop over age and see if the age if
-        if i > age:  # a number is greater than the given value
+        if i >= age:  # a number is greater than the given value
             counter += 1  # we add 1 to the value of counter and
             # than assign it to to the counter
 
