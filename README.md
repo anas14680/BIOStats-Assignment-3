@@ -24,7 +24,9 @@ Arguements:
 Output: Returns data as a `dictionary`, whose keys are the column names and the value for each key will a be list of `strings` the column entries.
 
 **Function 2**
+
 Name: num_older_than
+
 Description: This function tells us the number of patients older than a certain age.
 
 Arguements: 
@@ -35,6 +37,7 @@ Arguements:
 Outputs: Returns the number of patients older than the specified age. Sometimes can return a string that explains why the required number can be calculated, for example patient data file not meeting the exact requirements.
 
 **Function 3**
+
 Name: sick_patients
 
 Description: Returns the ID of all the `unique` patients that are visiting a certain lab. 
@@ -50,7 +53,9 @@ Output: Returns a list of unique PatientIDs that have visited that lab atleast o
 
 
 **Function 4**
+
 Name: patient_age_on_first_test
+
 Description: This function gives a the age of a specific patient on the data of their first test.
 
 Arguements: 
