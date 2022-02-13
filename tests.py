@@ -1,7 +1,12 @@
 """This is a test file to test our functions in the Main file."""
 import pytest
 import pytest_cov
-from Bio_stats_assignment import parse_data, num_older_than, sick_patients, patient_age
+from Bio_stats_assignment import (
+    parse_data,
+    num_older_than,
+    sick_patients,
+    patient_age_on_first_test,
+)
 
 # test the parse data function
 
@@ -9,8 +14,7 @@ from Bio_stats_assignment import parse_data, num_older_than, sick_patients, pati
 def test_parse_data():
     """Test Parse Data."""
     # test data with only columns
-    columns_only = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/columns only.txt"
+    columns_only = "columns only.txt"
     data_columns_only = {
         "PatientID": [],
         "LabName": [],
@@ -19,8 +23,7 @@ def test_parse_data():
     }
 
     # test a simple sample data
-    simple_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/simple data.txt"
+    simple_data = "simple data.txt"
     data_simple_parse = {
         "Name": ["Anas", "Jon Snow", "Rumi"],
         "Age": ["25", "31", "21"],
@@ -29,8 +32,7 @@ def test_parse_data():
     }
 
     # test a patient data
-    patient_test_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/Patient test.txt"
+    patient_test_data = "Patient test.txt"
     parsed_patient_test = {
         "PatientID": ["ANAS123", "JON234", "RUMI874", "JONNA465"],
         "PatientGender": ["M", "M", "M", "F"],
@@ -40,12 +42,11 @@ def test_parse_data():
             "1984-02-28 02:45:40.547",
             "1990-07-28 02:45:40.547",
         ],
-        "PatientRace": ["Asian", "White", "Asian", "White"],
+        "PatientRace": ["Asian ", "White", "Asian", "White"],
     }
 
     # test a sample lab test data
-    labs_data_test = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/LABS TEST.txt"
+    labs_data_test = "LABS TEST.txt"
     parsed_patient_labs = {
         "PatientID": [
             "ANAS123",
@@ -118,12 +119,10 @@ def test_parse_data():
 # test num_older function
 def test_num_older():
     """Test number older than a particular age."""
-    columns_only = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/columns only.txt"
+    columns_only = "columns only.txt"
     data_columns = parse_data(columns_only)
 
-    patient_test_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/Patient test.txt"
+    patient_test_data = "Patient test.txt"
     patient_data = parse_data(patient_test_data)
 
     # 25, 45, 34, 32
@@ -142,16 +141,13 @@ def test_num_older():
 
 def test_sick_patients():
     """Test Sick Patients fucntion."""
-    labs_data_test = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/LABS TEST.txt"
+    labs_data_test = "LABS TEST.txt"
     parsed_lab_data = parse_data(labs_data_test)
 
-    columns_only = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/columns only.txt"
+    columns_only = "columns only.txt"
     data_columns = parse_data(columns_only)
 
-    patient_test_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/Patient test.txt"
+    patient_test_data = "Patient test.txt"
     patient_data = parse_data(patient_test_data)
 
     # in the function i convert to a set and then list to check for unique values
@@ -180,25 +176,22 @@ def test_sick_patients():
 
 
 # check patients age on first lab test
-def test_patient_age():
+def test_patient_age_on_first_test():
     """Test patient age on first lab test."""
-    labs_data_test = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/LABS TEST.txt"
+    labs_data_test = "LABS TEST.txt"
     parsed_lab_data = parse_data(labs_data_test)
 
-    simple_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/simple data.txt"
+    simple_data = "simple data.txt"
     data_simple = parse_data(simple_data)
 
-    patient_test_data = "/Users/mohammadanas/Desktop/Duke MIDS/Spring 2021\
-/SoftwareTools/Assignment 4/Patient test.txt"
+    patient_test_data = "Patient test.txt"
     patient_data = parse_data(patient_test_data)
 
     # a basic test to see if the function works correctly
-    assert patient_age("ANAS123", parsed_lab_data, patient_data) == 25
+    assert patient_age_on_first_test("ANAS123", parsed_lab_data, patient_data) == 25
 
     # To check if the function works fine if patient not found in data
     assert (
-        patient_age("ANNA123", parsed_lab_data, patient_data)
+        patient_age_on_first_test("ANNA123", parsed_lab_data, patient_data)
         == "No information available on patient with ID:ANNA123"
     )

@@ -1,0 +1,4 @@
+Name	Age	City	Major
+Anas	25	Durham	Data Science
+Jon Snow	31	The Wall	Ranger
+Rumi	21	Ohio	CS

@@ -144,7 +144,7 @@ def sick_patients(
     # complexity of the above function is O(2+1+1+N+N+N+1) -> O(5+3N) -> O(N)
 
 
-def patient_age(
+def patient_age_on_first_test(
     patientID: str, labs_data: dict[str, list[str]], patient_data: dict[str, list[str]]
 ) -> Union[int, str]:
     """Return the age oof patient on their first test date."""
