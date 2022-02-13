@@ -14,7 +14,9 @@ To install this package, you can clone the github repository it has been placed 
 The package facilitates a number of functionalities. Below we have gone over each of these, the function name associated with each functionality, and the how to sucessfully execute each function. All the functions take the arguements in the below mentioned order. 
 
 **Function 1**
+
 Name: parse_data
+
 Description: Restructures that data into a `dictionary` data type that can be easily manipulated to suit your needs.
 
 Arguements: 
