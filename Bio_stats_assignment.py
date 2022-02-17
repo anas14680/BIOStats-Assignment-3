@@ -62,7 +62,7 @@ def num_older_than(
     today_date: datetime = datetime.today()  # O(1) generate todays date
 
     if "PatientDateOfBirth" not in patient_data.keys():  # O(1)
-        return "No information found regarding Age"  # O(1)
+        raise KeyError(f"No information found regarding Age")  # O(1)
 
     patient_data["PatientDateOfBirth_dtformat"] = [
         datetime.strptime(i, "%Y-%m-%d %H:%M:%S.%f")
@@ -150,7 +150,9 @@ def patient_age_on_first_test(
     """Return the age oof patient on their first test date."""
     # returns this string if Patient not in data
     if patientID not in patient_data["PatientID"]:  # O(1)
-        return f"No information available on patient with ID:{patientID}"  # O(1)
+        raise ValueError(
+            f"No information available on patient with ID:{patientID}"
+        )  # O(1)
 
     # create an empty list to store Visit dates on the patient
     labvisit_dates: list[str] = []  # O(1)

@@ -133,7 +133,8 @@ def test_num_older():
     )  # checks if age integer is greater than actual age like
     # person who is aged 25 is technically older than 25. Becasue he
     # 25 months X months
-    assert num_older_than(38, data_columns) == "No information found regarding Age"
+    with pytest.raises(KeyError):
+        num_older_than(38, data_columns)
 
 
 # test Sick patients function
@@ -191,7 +192,5 @@ def test_patient_age_on_first_test():
     assert patient_age_on_first_test("ANAS123", parsed_lab_data, patient_data) == 25
 
     # To check if the function works fine if patient not found in data
-    assert (
+    with pytest.raises(ValueError):
         patient_age_on_first_test("ANNA123", parsed_lab_data, patient_data)
-        == "No information available on patient with ID:ANNA123"
-    )
