@@ -1,57 +1,73 @@
-# Computational complexity/Data structures
+### EHR LIBRARY
 
-Develop a Python module that provides some simple analytical capabilities on some (synthetic) EHR data. This is provided as:
+This package has been made to facilitate patient data analytics. This can be useful in evaluating clinical trials and analyzing medical data. The package has been written in python. 
 
-* A table of patients with demographic data: `PatientCorePopulatedTable.txt`
-* A table of laboratory results: `LabsCorePopulatedTable.txt`
+#### Installation and Requirements
 
-## Data parsing
+To install this package, you can clone the github repository it has been placed on. The following python modules are required for successful implimentation of this module.
 
-Define a function `parse_data(filename: str) -> ???` that reads and parses the data files. Choose appropriate data structures such that the expected analyses (below) are efficient.
+1) Time
+2) Pytests
 
-Include a module docstring describing your rationale for choosing these data structures.
+#### Functionalities
 
-Include a function docstring analyzing the computational complexity of the data parser.
+The package facilitates a number of functionalities. Below we have gone over each of these, the function name associated with each functionality, and the how to sucessfully execute each function. All the functions take the arguements in the below mentioned order. 
 
-## Analysis
+**Function 1**
 
-Define the following functions to interrogate the data. In each one, include a function docstring describing its computational complexity _at runtime_ (i.e. after parsing into the global data structures).
+Name: parse_data
 
-### Old patients
+Description: Restructures that data into a `dictionary` data type that can be easily manipulated to suit your needs.
 
-The function `num_older_than(age, ???)` should take the data and return the number of patients older than a given age (in years). For example,
+Arguements: 
 
-```python
->> num_older_than(51.2)
-52
-```
+1. filename -> this is the path for `TAB` delimited `txt` file which contains all the data. 
 
-### Sick patients
+Output: Returns data as a `dictionary`, whose keys are the column names and the value for each key will a be list of `strings` the column entries.
 
-The function `sick_patients(lab, gt_lt, value, ???)` should take the data and return a (unique) list of patients who have a given test with value above (">") or below ("<") a given level. For example,
+**Function 2**
 
-```python
->> sick_patients("METABOLIC: ALBUMIN", ">", 4.0)
-["FB2ABB23-C9D0-4D09-8464-49BF0B982F0F", "64182B95-EB72-4E2B-BE77-8050B71498CE"]
-```
+Name: num_older_than
 
-## Notes
+Description: This function tells us the number of patients older than a certain age.
 
-All of this should be generalizable, i.e. it should be designed to work with files with these formats, not just these _specific_ files. State (in module/function docstrings) any assumptions that you make about the input data.
+Arguements: 
 
-When describing computational complexity, document your thought process in detail. For example:
+1. age -> Can be an `integer` or a `float`.
+2. Patient_dataset -> a dictionary containing information on all the patients. This dictionary should have the format that is similar to the one returned by the parse_data function above. The data should have a `PatientDateOfBirth` column.  The values corresponding to `PatientDateOfBirth` key should follow the format `YYYY-mm-dd HH:MM:SS.MS` where `SS.MS` indicated seconds and microseconds.
 
-> 5 is added to `element`, which is a single operation. This operation is performed twice for each element, leading to 2N operations. For big-O analysis, we drop the constant factor, yielding O(N) complexity.
+Outputs: Returns the number of patients older than the specified age. Sometimes can return a string that explains why the required number can be calculated, for example patient data file not meeting the exact requirements.
 
-You may like to use the `datetime` (standard) library. _Do not import any other libraries._
+**Function 3**
 
-Your submission should be a single file titled `ehr_analysis.py`.
+Name: sick_patients
 
-## Submission
+Description: Returns the ID of all the `unique` patients that are visiting a certain lab. 
 
-1. Create a _private_ GitHub repository.
-2. Invite `patrickkwang` to collaborate.
-3. Create a branch called `part1` and complete this assignment there.
-4. Make a pull request `part1` -> `main`. _DO NOT MERGE IT._
-5. Request a review from `patrickkwang`.
-6. Submit the link to your repository on Sakai by the due date.
+Arguements: 
+
+1. labname -> a `string` datatype stating the name of the lab.
+2. gt_lt -> a comparison operator. This would take `string` datatype and should take only `>` or `<` as value.
+3. value -> a `float` data type that indicated the value of a particular lab test.
+4. labs_data -> a dictionary contain data on all the labs. The dictionary should have the format as returned by the parse data function and must have `labname`, `PatientID` and `LabValue` as keys.
+
+Output: Returns a list of unique PatientIDs that have visited that lab atleast once have a labvalue for that test greater than the specified level.
+
+
+**Function 4**
+
+Name: patient_age_on_first_test
+
+Description: This function gives a the age of a specific patient on the data of their first test.
+
+Arguements: 
+
+1. patientID: a `string` datatype stating the ID of the patient, whose age we want.
+2. labs_data: -> a dictionary contain data on all the labs. The dictionary should have the format as returned by the parse data function and must have `PatientID` and `LabDateTime` as keys. The values corresponding to `LabDateTime` key should follow the format `YYYY-mm-dd HH:MM:SS.MS` where `SS.MS` indicated seconds and microseconds.
+3. patient_data: a dictionary containing information on all the patients. This dictionary should have the format that is similar to the one returned by the parse_data function above. The data should have a `PatientDateOfBirth` column and `PatientID` column.  The values corresponding to `PatientDateOfBirth` key should follow the format `YYYY-mm-dd HH:MM:SS.MS` where `SS.MS` indicated seconds and microseconds.
+
+Output: Returns an `integer` that tells us the age of the specified patient on their first test.
+
+#### Testing
+
+To test the functions, you will require the `Pytest` module and will also require you to load the test data files uploaded on the same repository. All the functions have been tested in the `test.py` file. We shall run the command `pytest tests.py` in the terminal to check if the function pass the tests.
