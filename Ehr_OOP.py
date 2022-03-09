@@ -33,21 +33,25 @@ class Patient:
 
     def __eq__(self, other) -> bool:
         """Check if two patient classes are equal."""
-        flag: bool = True
-        if (
-            (self.id == other.id)
-            & (self.gender == other.gender)
-            & (self.dob == other.dob)
-            & (self.race == other.race)
+        flag: bool = True  # O(1)
+        if (  # O(1)
+            (self.id == other.id)  # O(1)
+            & (self.gender == other.gender)  # O(1)
+            & (self.dob == other.dob)  # O(1)
+            & (self.race == other.race)  # O(1)
         ):
-            for i, j in zip(self.labs, other.labs):
-                if i == j:
+            for i, j in zip(self.labs, other.labs):  # O(L)
+                if i == j:  # O(1)
                     pass
                 else:
-                    flag = False
+                    flag = False  # O(1)
         else:
-            flag = False
-        return flag
+            flag = False  # O(1)
+        return flag  # O(1)
+
+        # This equals method takes complexity of
+        # O(7 + 2L) where L is the number of labs
+        # visited by the patient.
 
     @property
     def age(self):
@@ -89,15 +93,17 @@ class Lab:
 
     def __eq__(self, other) -> bool:
         """Check if two lab classes are equal."""
-        if (
-            (self.name == other.name)
-            & (self.units == self.units)
-            & (self.value == other.value)
-            & (self.labdate == other.labdate)
+        if (  # O(1)
+            (self.name == other.name)  # O(1)
+            & (self.units == self.units)  # O(1)
+            & (self.value == other.value)  # O(1)
+            & (self.labdate == other.labdate)  # O(1)
         ):
-            return True
+            return True  # O(1)
         else:
             return False
+
+        ## The equals method has complexity #O(6)
 
 
 def parse_data(
