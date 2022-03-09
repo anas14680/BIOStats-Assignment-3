@@ -2,6 +2,7 @@
 
 
 from datetime import datetime
+from socket import IPV6_DSTOPTS
 from typing import Union
 
 
@@ -10,37 +11,57 @@ class Patient:
 
     def __init__(
         self,
-        PatientID: str,
+        id: str,
         gender: str,
-        DOB: Union[str, datetime],
+        dob: str,
         race: str,
         labs: list[str],
     ) -> None:
         """Instantiate Patient Class."""
-        self.patientID: str = PatientID  # O(1)
+        self.id: str = id  # O(1)
         self.gender: str = gender  # O(1)
-        self.DOB: datetime = datetime.strptime(DOB, "%Y-%m-%d %H:%M:%S.%f")  # O(2)
+        self.dob: Union[str, datetime] = datetime.strptime(
+            dob, "%Y-%m-%d %H:%M:%S.%f"
+        )  # O(2)
         self.race: str = race  # O(1)
         self.labs: list[str] = labs  # O(1)
         # class instantiation takes O(6) complexity
 
     def __str__(self):
         """Patient Class Representation."""
-        return self.patientID + " Class"  # O(1)
+        return self.id + " Class"  # O(1)
+
+    def __eq__(self, other) -> bool:
+        """Check if two patient classes are equal."""
+        flag: bool = True
+        if (
+            (self.id == other.id)
+            & (self.gender == other.gender)
+            & (self.dob == other.dob)
+            & (self.race == other.race)
+        ):
+            for i, j in zip(self.labs, other.labs):
+                if i == j:
+                    pass
+                else:
+                    flag = False
+        else:
+            flag = False
+        return flag
 
     @property
     def age(self):
         """Calculate patient age."""
         today = datetime.today()  # O(2)
-        return int((today - self.DOB).days / 365.25)  # O(4)
+        return int((today - self.dob).days / 365.25)  # O(4)
 
     @property
     def age_first_admission(self):
         """Calculate age at first lab test."""
         # get min lab date for the patient
-        mindate = min([i.labDate for i in self.labs])  # O(P)
+        mindate = min([i.labdate for i in self.labs])  # O(P)
         # get age at the first lab visit
-        return int((mindate - self.DOB).days / 365.25)  # O(4)
+        return int((mindate - self.dob).days / 365.25)  # O(4)
 
 
 class Lab:
@@ -48,23 +69,35 @@ class Lab:
 
     def __init__(
         self,
-        Labname: str,
+        name: str,
         units: str,
         value: Union[str, float],
-        labDate: Union[str, datetime],
+        labdate: str,
     ) -> None:
         """Instantiate Lab Class."""
-        self.labname: str = Labname  # O(1)
+        self.name: str = name  # O(1)
         self.units: str = units  # O(1)
         self.value: Union[float, str] = float(value)  # O(1)
-        self.labDate: Union[str, datetime] = datetime.strptime(
-            labDate, "%Y-%m-%d %H:%M:%S.%f"
+        self.labdate: Union[str, datetime] = datetime.strptime(
+            labdate, "%Y-%m-%d %H:%M:%S.%f"
         )  # O(2)
         # instantiation of this class takes #O(5)
 
     def __str__(self):
         """Lab Class Representation."""
-        return self.labname  # O(1)
+        return self.name  # O(1)
+
+    def __eq__(self, other) -> bool:
+        """Check if two lab classes are equal."""
+        if (
+            (self.name == other.name)
+            & (self.units == self.units)
+            & (self.value == other.value)
+            & (self.labdate == other.labdate)
+        ):
+            return True
+        else:
+            return False
 
 
 def parse_data(
@@ -99,22 +132,22 @@ def parse_data(
             if counter == 1:  # O(1)
                 pass
             else:
-                patientID: str = line[0]  # O(2)
-                labname: str = line[2]  # O(2)
+                id: str = line[0]  # O(2)
+                name: str = line[2]  # O(2)
                 labvalue: str = line[3]  # O(2)
                 labunits: str = line[4]  # O(2)
-                labDate: str = line[5]  # O(2)
+                labdate: str = line[5]  # O(2)
                 # all the above have O(2) complexity
                 # because we extract and assign (2 operations)
 
-                lab_class: Lab = Lab(labname, labunits, labvalue, labDate)  # O(6)
+                lab_class: Lab = Lab(name, labunits, labvalue, labdate)  # O(6)
                 # instantion of lab class is O(5) and we assign this to
                 # lab_class variable
 
-                if patientID not in lab_dict:  # O(1)
-                    lab_dict[patientID] = [lab_class]  # O(2)
+                if id not in lab_dict:  # O(1)
+                    lab_dict[id] = [lab_class]  # O(2)
                 else:
-                    lab_dict[patientID].append(lab_class)  # O(2)
+                    lab_dict[id].append(lab_class)  # O(2)
 
     with open(patient_file, encoding="UTF-8-sig") as file:  # O(1)
 
@@ -130,18 +163,16 @@ def parse_data(
             if counter == 1:  # O(1)
                 pass
             else:
-                patientID = line[0]  # O(2)
+                id = line[0]  # O(2)
                 gender = line[1]  # O(2)
-                DOB = line[2]  # O(2)
+                dob = line[2]  # O(2)
                 race = line[3]  # O(2)
-                labs = lab_dict[patientID]  # O(2)
+                labs = lab_dict[id]  # O(2)
 
-                patient_dict[patientID] = Patient(
-                    patientID, gender, DOB, race, labs
-                )  # O(7)
+                patient_dict[id] = Patient(id, gender, dob, race, labs)  # O(7)
 
     if get_lab_dict:  # O(1)
-        return patient_dict, lab_dict  # O(1)
+        return (patient_dict, lab_dict)  # O(1)
     else:  # O(1)
         return patient_dict  # O(1)
 
@@ -188,7 +219,7 @@ def sick_patients(
     if gt_lt == ">":  # O(1)
         for i in lab_dict:  # O(N)
             for j in lab_dict[i]:  # O(N)
-                if (j.labname == lab_name) and (j.value > lab_value):  # O(3)
+                if (j.name == lab_name) and (j.value > lab_value):  # O(3)
                     patients.append(i)  # (1)
                     break  # we break to save time reduces time complexity
                 # as the inner loop stops as soon as the conditions are met

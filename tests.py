@@ -41,20 +41,7 @@ def test_parse_data():
 
     test = parse_data(labtest, pattest)
 
-    for i, j in zip(answer, test):
-        assert answer[i].patientID == test[j].patientID
-        assert answer[i].gender == test[j].gender
-        assert answer[i].DOB == test[j].DOB
-        assert answer[i].race == test[j].race
-
-        answer_lab = answer[i].labs
-        test_lab = test[j].labs
-
-        for k, l in zip(answer_lab, test_lab):
-            assert k.labname == l.labname
-            assert k.units == l.units
-            assert k.value == l.value
-            assert k.labDate == l.labDate
+    assert answer == test
 
 
 def test_first_test_age():
