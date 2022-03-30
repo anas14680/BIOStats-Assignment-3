@@ -3,6 +3,7 @@ from datetime import datetime
 import pytest
 from ehr_sqlite3 import Patient, Lab, store_patient_class, create_database
 
+
 # test the parse data function
 
 
@@ -40,3 +41,4 @@ def test_sqlite3_file():
         assert anas.labs[i].unit == units[i]
         assert anas.labs[i].value == values[i]
         assert anas.labs[i].date == datetime.strptime(dates[i], "%Y-%m-%d %H:%M:%S.%f")
+
