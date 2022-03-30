@@ -6,13 +6,15 @@ from datetime import date, datetime
 # the function insert information into the ehr database
 # and extracts information from the database to create
 # a patient class that stores all the information.
+# for the lab data we add an OBSID columns as primary key
+# this serves as a unique idetifier.
 def create_database(labpath: str, patientpath: str, dbpath: str) -> None:
     """Extract information from txt file."""
     con = sqlite3.connect(dbpath)
     cur = con.cursor()
 
     cur.execute(
-        """CREATE TABLE Patients(\
+        """CREATE TABLE IF NOT EXISTS Patients(\
             [PatientID] TEXT PRIMARY KEY,\
             [PatientGender] TEXT,\
             [PatientDateofBirth] TEXT,\
@@ -24,11 +26,12 @@ def create_database(labpath: str, patientpath: str, dbpath: str) -> None:
     )
 
     cur.execute(
-        """CREATE TABLE labs(\
+        """CREATE TABLE IF NOT EXISTS Labs(\
+            [ObsID] INTEGER PRIMARY KEY AUTOINCREMENT,\
             [PatientID] TEXT NOT NULL,\
             [AdmissionID] TEXT NOT NULL,\
             [LabName] TEXT,\
-            [LabValue] TEXT,\
+            [LabValue] REAL,\
             [LabUnits] TEXT,\
             [LabDateTime] TEXT\
             )"""
@@ -58,41 +61,49 @@ def create_database(labpath: str, patientpath: str, dbpath: str) -> None:
             if counter2 == 1:
                 pass
             else:
-                cur.execute("INSERT INTO Labs values (?,?,?,?,?,?)", line2)
+                line2[3] = float(line2[3])
+                cur.execute(
+                    "INSERT INTO Labs (PatientID, AdmissionID,\
+                    LabName, LabValue, LabUnits, LabDateTime) values (?,?,?,?,?,?)",
+                    line2,
+                )
+    con.commit()
     cur.close()
 
 
 # Below we define a lab class
-# This lab class takes lab name and patientID
+# This lab class takes lab ObsID to identify it and
 # to make a lab class
-# we take into account the lab and patient
-# becasue we do not have a unique identifier in
-# our lab class.
 
 
 class Lab:
     """Store Lab data."""
 
-    def __init__(self, name: str, patientID: str, dbpath: str) -> None:
+    def __init__(self, ObsID: int, dbpath: str) -> None:
         """Instantiate a class."""
-        self.name: str = name
-        self.patientID: str = patientID
+        self.ObsID = ObsID
         con = sqlite3.connect(dbpath)
         self.cur = con.cursor()
 
     def __str__(self) -> str:
         """Lab Class Representation."""
-        return str(self.name) + " attended by " + str(self.patientID)  # O(1)
+        return str(self.ObsID) + " observation in database."  # O(1)
 
     @property
-    def units(self) -> str:
+    def name(self) -> str:
+        """Return lab units."""
+        name: tuple = self.cur.execute(
+            """select LabName from Labs where ObsID= ?""",
+            (self.ObsID,),
+        ).fetchone()
+        return name[0]
+
+    @property
+    def unit(self) -> str:
         """Return lab units."""
         unit: tuple = self.cur.execute(
-            """select LabUnits from Labs where LabName = ? and PatientID = ?""",
-            (
-                self.name,
-                self.patientID,
-            ),
+            """select LabUnits from Labs where ObsID= ?""",
+            (self.ObsID,),
         ).fetchone()
         return unit[0]
 
@@ -100,17 +111,16 @@ class Lab:
     def value(self) -> float:
         """Return lab units."""
         value: tuple[str] = self.cur.execute(
-            """select LabValue from Labs where LabName = ? and PatientID = ?""",
-            (self.name, self.patientID),
+            """select LabValue from Labs where ObsID = ?""", (self.ObsID,)
         ).fetchone()
         return float(value[0])
 
     @property
-    def labdate(self) -> datetime:
+    def date(self) -> datetime:
         """Return the date of test."""
         DOB: str = self.cur.execute(
-            """select LabDateTime from Labs where LabName = ? and PatientID = ?""",
-            (self.name, self.patientID),
+            """select LabDateTime from Labs where ObsID = ?""",
+            (self.ObsID,),
         ).fetchone()[0]
         DOB_dt: datetime = datetime.strptime(DOB, "%Y-%m-%d %H:%M:%S.%f")
         return DOB_dt
@@ -118,7 +128,10 @@ class Lab:
 
 # below we create a patient class that extracts
 # relevant information from the database
-class patient:
+# It also includes information about the Labs
+# attended by the patient. These labs are storing
+# information in form of lab class.
+class Patient:
     """Store a patient data."""
 
     def __init__(self, id: str, dbpath: str) -> None:
@@ -162,18 +175,24 @@ class patient:
     def labs(self) -> list[Lab]:
         """Exctract all labs attended by patient."""
         labs: list[tuple[str]] = self.cur.execute(
-            """select LabName, PatientID from Labs where PatientID = ?""", (self.id,)
+            """select ObsID from Labs where PatientID = ?""", (self.id,)
         ).fetchall()
 
-        labs_cl: list[Lab] = [Lab(i[0], i[1], self.dbpath) for i in labs]
+        labs_cl: list[Lab] = [Lab(i[0], self.dbpath) for i in labs]
         return labs_cl
 
 
-# patient classes instantiated and stored
-# to a dictionary
-def parse_data(patient_path, dbpath: str) -> dict[str, patient]:
+# This function takes the data and creates a
+# patient class to store them in dictionary.
+# We could have done this in the create
+# data base function above, but we assume for that the
+# user might want to create database only once and hence,
+# provide a seperate function to store information for classes
+
+
+def store_patient_class(patient_path, dbpath: str) -> dict[str, Patient]:
     """Parse the data."""
-    patient_data: dict[str, patient] = {}
+    patient_data: dict[str, Patient] = {}
     with open(patient_path, encoding="UTF-8-sig") as file:
         counter: int = 0
 
@@ -183,6 +202,6 @@ def parse_data(patient_path, dbpath: str) -> dict[str, patient]:
             if counter == 1:
                 pass
             else:
-                patient_data[line[0]] = patient(line[0], dbpath)
+                patient_data[line[0]] = Patient(line[0], dbpath)
 
     return patient_data
