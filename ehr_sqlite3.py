@@ -3,13 +3,12 @@ import sqlite3
 from datetime import date, datetime
 
 
-# the function insert information into the ehr database
-# and extracts information from the database to create
-# a patient class that stores all the information.
-# for the lab data we add an OBSID columns as primary key
-# this serves as a unique idetifier.
 def create_database(labpath: str, patientpath: str, dbpath: str) -> None:
-    """Extract information from txt file."""
+    """Insert information into the ehr database and extracts
+    information from the database to create a patient class that stores all
+    the information. For the lab data we add an OBSID columns as primary key
+    this serves as a unique idetifier."""
+
     con = sqlite3.connect(dbpath)
     cur = con.cursor()
 
@@ -181,27 +180,66 @@ class Patient:
         labs_cl: list[Lab] = [Lab(i[0], self.dbpath) for i in labs]
         return labs_cl
 
+    @property
+    def age(self):
+        """Calculate patient age."""
+        today = datetime.today()
+        return int((today - self.dateofbirth).days / 365.25)
 
-# This function takes the data and creates a
-# patient class to store them in dictionary.
-# We could have done this in the create
-# data base function above, but we assume for that the
-# user might want to create database only once and hence,
-# provide a seperate function to store information for classes
+    @property
+    def age_first_admission(self):
+        """Calculate age at first lab test."""
+        # get min lab date for the patient
+        mindate = min([i.date for i in self.labs])
+        # get age at the first lab visit
+        return int((mindate - self.dateofbirth).days / 365.25)
+
+    def __eq__(self, other):
+        """Test if two Patient Classes are equal."""
+        if self.id == other.id and self.dbpath == other.dbpath:
+            return True
+        else:
+            return False
 
 
-def store_patient_class(patient_path, dbpath: str) -> dict[str, Patient]:
-    """Parse the data."""
-    patient_data: dict[str, Patient] = {}
-    with open(patient_path, encoding="UTF-8-sig") as file:
-        counter: int = 0
+def store_patient_class(dbpath: str) -> dict[str, Patient]:
+    """Store patient IDs in patient class using a dictionary."""
+    con = sqlite3.connect(dbpath)
+    cur = con.cursor()
+    data_dict: dict[str, Patient] = {}
+    ids: list[tuple[str]] = cur.execute("select PatientID from Patients").fetchall()
+    for i in ids:
+        data_dict[i[0]] = Patient(i[0], dbpath)
+    return data_dict
 
-        for line in file:
-            counter += 1
-            line1: list[str] = line.split("\t")
-            if counter == 1:
-                pass
-            else:
-                patient_data[line[0]] = Patient(line[0], dbpath)
 
-    return patient_data
+def num_older_than(patient_dic: dict[str, Patient], age_thresh: int) -> int:
+    """Calculate the number of people older than age Thresh."""
+    counter: int = 0  # O(1)
+    for i in patient_dic:  # O(N)
+        if patient_dic[i].age > age_thresh:  # 0(1)
+            counter += 1  # O(1)
+
+    return counter
+
+
+def sick_patients(
+    dbpath: str, gt_lt: str, lab_value: float, lab_name: str
+) -> list[str]:
+    """Return sick patient with lab value greater or less than the given lab value."""
+    con = sqlite3.connect(dbpath)
+    cur = con.cursor()
+    if gt_lt == ">":
+        unique_ids = cur.execute(
+            "select Distinct PatientID from Labs where LabName = ? and LabValue > ?",
+            (lab_name, lab_value),
+        )
+    elif gt_lt == "<":
+        unique_ids = cur.execute(
+            "select Distinct PatientID from Labs where LabName = ? and LabValue < ?",
+            (lab_name, lab_value),
+        )
+    else:
+        raise ValueError
+
+    return [i[0] for i in unique_ids]
