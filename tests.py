@@ -11,6 +11,7 @@ from ehr_sqlite3 import (
     sick_patients,
 )
 
+
 # test the parse data function
 def test_sqlite3_file():
     """Test Parse data function."""

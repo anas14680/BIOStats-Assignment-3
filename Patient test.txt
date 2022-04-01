@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 PatientID	PatientGender	PatientDateOfBirth	PatientRace	PatientMaritalStatus	PatientLanguage	PatientPopulationPercentageBelowPoverty
 ANAS123	M	1996-04-04 02:45:40.547	Asian	Single	Urdu	0.1
 JON234	M	1976-12-28 02:45:40.547	White	Married	English	12
 RUMI874	M	1984-02-28 02:45:40.547	Asian	Married	Persian	18
 JONNA465	F	1990-07-28 02:45:40.547	White	Single	English	13
+=======
+PatientID	PatientGender	PatientDateOfBirth	PatientRace
+ANAS123	M	1996-04-04 02:45:40.547	Asian
+JON234	M	1976-12-28 02:45:40.547	White
+>>>>>>> c9bbd62db0963bf2a47c8cfbd270b9ccdec2bb1a
