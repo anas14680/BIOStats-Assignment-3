@@ -107,7 +107,7 @@ def test_number_older_than():
 
 
 def test_sick_patients():
-    """Test num older than function."""
+    """Test sick patients function."""
     dbtest = "testdb.db"
     labtest = "LABS TEST.txt"
     pattest = "Patient test.txt"
